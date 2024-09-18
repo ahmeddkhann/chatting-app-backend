@@ -133,10 +133,42 @@ const logoutUser = asyncHandler(async (req, res) => {
     });
 })
 
+const refreshAccessToken = asyncHandler (async (req, res) => {
+    const incomingRefreshToken = req.body.accessToken || req.header.accessToken
+    if (!incomingRefreshToken){
+        throw new ApiError(402,"unAuthorized Request")
+    }
 
+    try {
+        const decodedToken = jwt.verify(
+            incomingRefreshToken, process.env.ACCESS_TOKEN_SECRET
+        )
+        const user = await User.findById(decodedToken._id)
+        if (!user) {
+            throw new ApiError(402, "user does not exists")
+        }
+        if (!incomingRefreshToken === user.accessToken){
+            throw new ApiError(402, "token is incorrect!!! access denied")
+        }
+        const {accessToken, refreshToken} = generateAccessAndRefreshToken(user._id)
+        
+       return res
+       .status(200)
+       .json(
+        new ApiResponse(
+            200,
+            {accessToken, refreshToken},
+            "refresh token updated successfully"
+        )
+       )
+    } catch (error) {
+        
+    }
+})
 
 export {
     registerUser,
     loginUser,
-    logoutUser
+    logoutUser,
+    refreshAccessToken
 }
