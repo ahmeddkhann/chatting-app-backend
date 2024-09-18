@@ -1,5 +1,4 @@
 import mongoose, {Schema} from "mongoose"
-
 const userProfileSchema = new Schema ({
     user: {
         type: Schema.Types.ObjectId,
@@ -23,4 +22,4 @@ const userProfileSchema = new Schema ({
       }
 },{timestamps: true})
 
-const UserProfile = mongoose.model("UserProfile", userProfileSchema) 
+export const UserProfile = mongoose.model("UserProfile", userProfileSchema) 
