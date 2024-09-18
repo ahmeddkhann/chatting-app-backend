@@ -166,9 +166,48 @@ const refreshAccessToken = asyncHandler (async (req, res) => {
     }
 })
 
+const updatePassword = asyncHandler(async(req, res) => {
+
+    try {
+        const {oldPassword, newPassword, confirmPassword} = req.body
+        const user = await User.findById(req.user._id)
+
+        if (!user){
+            throw new ApiError(402, "user does not exists")
+        }
+
+        const checkPassword = bcrypt.compare(oldPassword, user.password )
+        if (!checkPassword){
+            throw new ApiError (402, "incorrect password")
+        }
+
+        if (confirmPassword !== newPassword){
+            throw new ApiError(402, "your old and new password does not match")
+        }
+
+        user.password = newPassword
+       await user.save({validateBeforeSave: false})
+
+       return res
+       .status (200)
+       .json(
+        new ApiResponse (
+            200,
+            "password is updated successfully"
+        )
+       )
+
+    } catch (error) {
+        throw new ApiError (
+            402, "password updation failed.. please try again"
+        )
+    }
+})
+
 export {
     registerUser,
     loginUser,
     logoutUser,
-    refreshAccessToken
+    refreshAccessToken,
+    updatePassword
 }
