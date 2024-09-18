@@ -10,3 +10,5 @@ class ApiResponse {
         success = true
     }
 }
+
+export {ApiResponse}
