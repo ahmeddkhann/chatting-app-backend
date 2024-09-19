@@ -208,7 +208,7 @@ const updateEmail = asyncHandler (async (req, res) => {
     const {email, password} = req.body
 
     try {
-        if (!email && !password){
+        if (!email || !password){
             throw new ApiError (403, "email and password are must required")
         }
 
@@ -240,11 +240,47 @@ const updateEmail = asyncHandler (async (req, res) => {
     }
 })
 
+const updateUsername = asyncHandler (async (req, res) => {
+    const {username, password} = req.body
+
+    try {
+        if (!username || !password){
+            throw new ApiError (402, "username and password is must required")
+        }
+
+        const user = await User.findById(req.user._id)
+        if (!user){
+            throw new ApiError (403, "user does not exists")
+        }
+
+        const matchPassword = bcrypt.compare(user.password, password)
+        if (!matchPassword){
+            throw new ApiError(403, "password does not match")
+        }
+
+        if (user.username === username){
+            throw new ApiError(403, "username cannot be same as old one")
+        }
+
+        const alreadyExistingUsername = await User.findOne(username)
+        if (alreadyExistingUsername){
+            throw new ApiError(403, "username already exists")
+        }
+
+        user.username = user
+        await user.save({validateBeforeSave: false})
+
+    } catch (error) {
+        throw new ApiError (501, "error while updating username")
+    }
+})
+
 export {
     registerUser,
     loginUser,
     logoutUser,
     refreshAccessToken,
     updatePassword,
-    updateEmail
+    updateEmail,
+    updateUsername
 }
