@@ -204,10 +204,47 @@ const updatePassword = asyncHandler(async(req, res) => {
     }
 })
 
+const updateEmail = asyncHandler (async (req, res) => {
+    const {email, password} = req.body
+
+    try {
+        if (!email && !password){
+            throw new ApiError (403, "email and password are must required")
+        }
+
+        const user = await User.findById(req.user._id)
+        if (!user){
+            throw new ApiError(401,"user does not exists")
+        }
+        
+        const matchPassword = bcrypt.compare(user.password, password)
+        if (!matchPassword){
+            throw new ApiError(403, "password does not match")
+        }
+
+        if (user.email === email){
+            throw new ApiError(403, "email cannot be same as old one")
+        }
+
+        const alreadyExistingEmail = await User.findOne(email)
+        if(alreadyExistingEmail){
+            throw new ApiError(403, "email already exists")
+        }
+
+        user.email = email
+        await user.save({validateBeforeSave: false})
+
+
+    } catch (error) {
+        throw new ApiError (500, "error while updating email")
+    }
+})
+
 export {
     registerUser,
     loginUser,
     logoutUser,
     refreshAccessToken,
-    updatePassword
+    updatePassword,
+    updateEmail
 }
