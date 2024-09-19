@@ -275,6 +275,80 @@ const updateUsername = asyncHandler (async (req, res) => {
     }
 })
 
+const updateName = asyncHandler (async (req, res) => {
+        try {
+            const {name} = req.body
+            const user = await User.findById(req.user._id)
+            if (!user){
+                throw new ApiError (403, "user does not exists")
+            }
+            if (!name){
+                throw new ApiError (402, "please enter new name")
+            }
+            user.name = name
+            await user.save({validateBeforeSave: false})
+            return res
+            .status(200)
+            .json(
+                new ApiResponse(
+                    200,
+                    "name is updated successfully"
+                )
+            )
+            
+        } catch (error) {
+            throw new ApiError (501, "error while updating name")
+        }
+})
+
+const updatePhone = asyncHandler (async (req, res) => {
+    const {phone} = req.body
+    const user = await User.findById(req.user._id)
+
+    if (!user){
+        throw new ApiError(402, "user does not exists")
+    }
+    if (!phone){
+        throw new ApiError (401, "please enter phone number first before editing")
+    }
+    user.phone = phone 
+    await user.save({validateBeforeSave: false})
+
+    return res
+    .status(201)
+    .json(
+        new ApiResponse (200, "phone number updated successfully")
+    )
+})
+
+const updateAddress = asyncHandler (async (req, res) => {
+
+    const {address} = req.body
+    const { city, state, postalCode } = address;
+    const user = await User.findById(req.user._id)
+
+    if(!user){
+        throw new ApiError(402, "user does not exists")
+    }
+
+    if (!city || !postalCode || !state){
+        throw new ApiError (402, "please enter all details first")
+    }
+    
+    user.address ={
+        postalCode,
+        city,
+        state
+    }
+    await user.save({validateBeforeSave: false})
+
+    return res
+    .status (200)
+    .json(
+        200 , "address updated successfuly"
+    )
+})
+
 export {
     registerUser,
     loginUser,
@@ -282,5 +356,8 @@ export {
     refreshAccessToken,
     updatePassword,
     updateEmail,
-    updateUsername
+    updateUsername,
+    updateName,
+    updatePhone,
+    updateAddress
 }
