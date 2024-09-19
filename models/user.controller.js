@@ -2,6 +2,7 @@ import { ApiResponse } from "./ApiResponse"
 import { ApiError } from "./ApiError"
 import {asyncHandler} from "./asyncHandler"
 import { User } from "./user.models";
+import { UserProfile } from "./userProfile.models";
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 
@@ -321,6 +322,27 @@ const updatePhone = asyncHandler (async (req, res) => {
     )
 })
 
+
+const updateBio = asyncHandler (async (req, res) => {
+    const {bio} = req.body
+    const user = await UserProfile.findById(req.user._id)
+
+    if (!user){
+        throw new ApiError(402, "user does not exists")
+    }
+    if (!bio){
+        throw new ApiError (401, "please enter bio first before editing")
+    }
+    user.bio = bio
+    await user.save({validateBeforeSave: false})
+
+    return res
+    .status(201)
+    .json(
+        new ApiResponse (200, "bio updated successfully")
+    )
+})
+
 const updateAddress = asyncHandler (async (req, res) => {
 
     const {address} = req.body
@@ -359,5 +381,6 @@ export {
     updateUsername,
     updateName,
     updatePhone,
-    updateAddress
+    updateAddress,
+    updateBio
 }

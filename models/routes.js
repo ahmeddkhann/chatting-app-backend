@@ -10,7 +10,8 @@ import {
     updateUsername,
     updateName,
     updatePhone,
-    updateAddress
+    updateAddress,
+    updateBio
 } from "./user.controller"
 
 const router = Router()
@@ -24,4 +25,5 @@ router.route("/updateEmail").patch(verifyJWT, updateEmail)
 router.route("/updateUsername").patch(verifyJWT, updateUsername)
 router.route("/updateName").patch(verifyJWT, updateName)
 router.route("/updatePhone").patch(verifyJWT, updatePhone)
+router.route("/updateBio").patch(verifyJWT, updateBio)
 router.route("/updateAddress").patch(verifyJWT, updateAddress)
